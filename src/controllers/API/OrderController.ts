@@ -84,16 +84,24 @@ class OrderController {
 
         const responseVerify = await axios(configVerify);
         const { data, status } = responseVerify.data;
-        order.status = status && data.status === "success";
-        await order.save();
-        return res.statusJson(200, {
-          data: {
-            message: "Order Verified",
-            order,
-          },
-        });
+        if (status && data.status === "success") {
+          order.status = true;
+          await order.save();
+          return res.statusJson(200, {
+            data: {
+              message: "Order verification successful",
+              order,
+            },
+          });
+        } else {
+          return res.statusJson(200, {
+            data: {
+              message: "Order verification unsuccessful",
+            },
+          });
+        }
       }
-      return res.statusJson(400, {
+      return res.statusJson(200, {
         data: {
           message: "Order not found",
         },
