@@ -72,23 +72,30 @@ class OrderController {
     const { reference } = req.params;
     try {
       const order = await OrderModel.findOne({ paymentRef: reference });
-      const dataVerify = JSON.stringify({ reference: reference });
-      const GET: Method = "GET";
-      const configVerify = {
-        method: GET,
-        url: `${PAYSTACK}/verify/${reference}`,
-        headers: Header,
-        data: dataVerify,
-      };
+      if (order) {
+        const dataVerify = JSON.stringify({ reference: reference });
+        const GET: Method = "GET";
+        const configVerify = {
+          method: GET,
+          url: `${PAYSTACK}/verify/${reference}`,
+          headers: Header,
+          data: dataVerify,
+        };
 
-      const responseVerify = await axios(configVerify);
-      const { data, status } = responseVerify.data;
-      order.status = status && data.status === "success";
-      await order.save();
-      return res.statusJson(200, {
+        const responseVerify = await axios(configVerify);
+        const { data, status } = responseVerify.data;
+        order.status = status && data.status === "success";
+        await order.save();
+        return res.statusJson(200, {
+          data: {
+            message: "Order Verified",
+            order,
+          },
+        });
+      }
+      return res.statusJson(400, {
         data: {
-          message: "Order Verified",
-          order,
+          message: "Order not found",
         },
       });
     } catch (error) {
