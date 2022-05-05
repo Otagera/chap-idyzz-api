@@ -1,0 +1,1 @@
+{"version":3,"file":"APIController.js","sourceRoot":"","sources":["../../src/controllers/APIController.ts"],"names":[],"mappings":";;AAAA,gCAA8B;AAC9B,mCAAiC","sourcesContent":["import \"./API/UserController\";\nimport \"./API/PaymentController\";\n"]}

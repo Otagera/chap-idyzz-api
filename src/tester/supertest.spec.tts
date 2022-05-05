@@ -1,0 +1,41 @@
+import express from 'express';
+import request from 'supertest';
+import { expect } from 'chai';
+
+function createApp(){
+	const app = express();
+	const router = express.Router();
+	router.route('/').get(function(req, res){
+		return res.json({ goodCall: true });
+	});
+
+	app.use(router);
+
+	return app;
+}
+
+describe('Our server', function(){
+	let app;
+
+	before(function(done){
+		app = createApp();
+		app.listen(function(err){
+			if(err){ return done(err); }
+			done();
+		});
+	});
+
+	it('should send back a JSON object with goodCall set to true', function(done){
+		request(app)
+				.get('/')
+				.set('Content-Type', 'application/json')
+				.expect('Content-Type', /json/)
+				.expect(200)
+				.end(function(err, res){
+					if(err) { return done(err); }
+					const callStatus = res.body.goodCall;
+					expect(callStatus).to.equal(true);
+					done();
+				});
+	});
+});

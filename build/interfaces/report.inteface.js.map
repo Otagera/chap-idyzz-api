@@ -1,0 +1,1 @@
+{"version":3,"file":"report.inteface.js","sourceRoot":"","sources":["../../src/interfaces/report.inteface.ts"],"names":[],"mappings":"","sourcesContent":["import { FieldSet } from 'airtable';\nexport interface Report extends FieldSet {\n\tid?: string;\n\temail: string;\n\tfullname: string;\n\tphone: number;\n\tmessage: string;\n}"]}
