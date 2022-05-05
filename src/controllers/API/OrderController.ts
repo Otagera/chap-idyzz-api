@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import axios, { Method } from "axios";
 import { get, post, bodyValidator, controller } from "../decorators/index";
-import { Product, Order } from "../../interfaces";
+import { Product, Order, OrderProduct } from "../../interfaces";
 import { base } from "../../app";
 
 const PAYSTACK = "https://api.paystack.co/transaction";
@@ -87,6 +87,24 @@ class OrderController {
         if (status && data.status === "success") {
           order.status = true;
           await order.save();
+          const productsArrays: OrderProduct[][] = [];
+          for (let ii = 0; ii < order.products.length; ii = +9) {
+            let t = [];
+            productsArrays.push(order.products.slice(ii, ii + 10));
+          }
+          for (let ii = 0; ii < productsArrays.length; ii++) {
+            const products = [];
+            for (const product of productsArrays[ii]) {
+              const prod = await ProductModel.find(`${product.id}`);
+              products.push({
+                id: prod.getId(),
+                fields: {
+                  Quantity: prod.get("Quantity") - product.quantity,
+                },
+              });
+            }
+            await ProductModel.update(products);
+          }
           return res.statusJson(200, {
             data: {
               message: "Order verification successful",

@@ -26,5 +26,5 @@ export interface Product extends FieldSet {
   LastModified: string;
   SalesGroup: string[];
   SR: string;
-  Quality: number;
+  Quantity: number;
 }
