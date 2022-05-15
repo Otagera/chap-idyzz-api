@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { get, controller } from "../decorators/index";
 import { Product } from "../../interfaces";
 import { base, view } from "../../app";
+import { Records } from "airtable";
 
 const ProductModel = base<Product>("product");
 
@@ -9,9 +10,15 @@ const ProductModel = base<Product>("product");
 class ProductController {
   @get("/products")
   async getProducts(req: Request, res: Response) {
-    const { page } = req.params;
+    const { quantity } = req.query;
     try {
-      const records = await ProductModel.select({ view }).all();
+      const productSelect = ProductModel.select({ view });
+      let records: Records<Product>;
+      if (quantity) {
+        records = await productSelect.firstPage();
+      } else {
+        records = await productSelect.all();
+      }
       // console.log(records);
       const products: Product[] = [];
       records.map((record) => {
