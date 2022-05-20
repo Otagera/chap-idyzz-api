@@ -74,7 +74,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next(createError(404));
 });
 
-// error handler
+// error  handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
