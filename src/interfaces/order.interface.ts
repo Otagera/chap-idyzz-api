@@ -1,8 +1,11 @@
 import { Document } from "mongoose";
 
+export interface OrderProductQuery {
+  PartNumber: string;
+  quantity: number;
+}
 export interface OrderProduct {
-  id?: string;
-  product?: string;
+  productId: string;
   quantity: number;
 }
 export interface Order extends Document {

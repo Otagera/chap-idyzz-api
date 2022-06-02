@@ -2,7 +2,12 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import axios, { Method } from "axios";
 import { get, post, bodyValidator, controller } from "../decorators/index";
-import { Product, Order, OrderProduct } from "../../interfaces";
+import {
+  Product,
+  Order,
+  OrderProduct,
+  OrderProductQuery,
+} from "../../interfaces";
 import { base } from "../../app";
 
 const PAYSTACK = "https://api.paystack.co/transaction";
@@ -16,14 +21,14 @@ const OrderModel = mongoose.model<Order>("Order");
 @controller("/api/order")
 class OrderController {
   @post("/checkout")
-  @bodyValidator("email", "products")
+  @bodyValidator("email", "products", "callback_url")
   async checkout(req: Request, res: Response) {
     const { email, products, callback_url } = req.body;
     try {
       const productsFound: Product[] = [];
       let totalAmount = 0;
-      const newProducts = [];
-      for (const product of products) {
+      const newProducts: OrderProduct[] = [];
+      for (const product of products as OrderProductQuery[]) {
         const productRecord = await ProductModel.select({
           filterByFormula: `PartNumber = "${product.PartNumber}"`,
         }).all();
@@ -32,7 +37,7 @@ class OrderController {
           totalAmount += productRecord[0].fields.MSRP * product.quantity;
           newProducts.push({
             ...product,
-            id: productRecord[0].getId(),
+            productId: productRecord[0].getId(),
           });
         }
       }
@@ -95,7 +100,7 @@ class OrderController {
           for (let ii = 0; ii < productsArrays.length; ii++) {
             const products = [];
             for (const product of productsArrays[ii]) {
-              const prod = await ProductModel.find(`${product.id}`);
+              const prod = await ProductModel.find(`${product.productId}`);
               products.push({
                 id: prod.getId(),
                 fields: {

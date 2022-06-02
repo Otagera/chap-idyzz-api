@@ -3,7 +3,6 @@ import { get, controller } from "../decorators/index";
 import { Product } from "../../interfaces";
 import { base, view } from "../../app";
 import { Records } from "airtable";
-import { ADDRCONFIG } from "dns";
 
 const ProductModel = base<Product>("product");
 

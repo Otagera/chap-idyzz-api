@@ -3,7 +3,7 @@ import { Order } from "../interfaces";
 
 const orderSchema = new Schema<Order>({
   products: {
-    type: [{ id: String, product: String, quantity: Number }],
+    type: [{ productId: String, quantity: Number }],
     required: true,
   },
   amount: { type: Number, required: true },

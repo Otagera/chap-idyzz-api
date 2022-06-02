@@ -11,7 +11,7 @@ describe("/api", () => {
   //So Id add authentication and try to signin before all the request and send the
   //token and be authenticated
   beforeEach(async () => {});
-  /* describe("GET /products", () => {
+  describe("GET /products", () => {
     it("should return all products", async function () {
       this.timeout(100000);
       //Its sending the data but its coming late because I think the data are so much that
@@ -20,7 +20,7 @@ describe("/api", () => {
       expect(res.status).to.equal(200);
       expect(res.body.data.length).not.equal(0);
     });
-  }); */
+  });
   describe("GET /products/search?", () => {
     it("should return all products that match both the search parameters", async function () {
       this.timeout(100000);
@@ -88,7 +88,7 @@ describe("/api", () => {
       expect(res.body.data.message).equal("No Product");
     });
   });
-  /* describe("GET /product", () => {
+  describe("GET /product", () => {
     it("should return products by id", async function () {
       const id = "recGG8Eb9SOrHv7sH";
       const res = await request(app).get(`/api/product/${id}`);
@@ -105,6 +105,6 @@ describe("/api", () => {
       const res = await request(app).get(`/api/product/${id}`);
       expect(res.status).to.equal(404);
     });
-  }); */
+  });
 });
 // ◢ ◤

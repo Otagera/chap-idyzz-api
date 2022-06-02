@@ -54,3 +54,4 @@ process.on("SIGTERM", () => {
 
 import "./user.model";
 import "./order.model";
+import "./cart.model";
