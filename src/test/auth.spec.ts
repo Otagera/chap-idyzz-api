@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+/* import mongoose from "mongoose";
 import request from "supertest";
 import { expect } from "chai";
 import { app } from "../app";
@@ -150,3 +150,4 @@ describe("/auth", () => {
     });
   });
 });
+ */

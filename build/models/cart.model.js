@@ -24,14 +24,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var mongoose_1 = __importStar(require("mongoose"));
-var orderSchema = new mongoose_1.Schema({
-    products: {
-        type: [{ productId: String, quantity: Number }],
+var cartSchema = new mongoose_1.Schema({
+    userId: { type: String, required: true },
+    cartItems: {
+        type: [
+            {
+                productId: { type: String, required: true },
+                quantity: { type: Number, required: true },
+            },
+        ],
         required: true,
     },
-    amount: { type: Number, required: true },
-    paymentRef: { type: String, required: true },
-    status: { type: Boolean, default: false },
 });
-mongoose_1.default.model("Order", orderSchema);
-//# sourceMappingURL=order.model.js.map
+mongoose_1.default.model("Cart", cartSchema);
+//# sourceMappingURL=cart.model.js.map

@@ -20,6 +20,8 @@ __exportStar(require("./user.interface"), exports);
 __exportStar(require("./product.interface"), exports);
 //order
 __exportStar(require("./order.interface"), exports);
+//cart
+__exportStar(require("./cart.interface"), exports);
 //util
 __exportStar(require("./util.interface"), exports);
 //# sourceMappingURL=index.js.map

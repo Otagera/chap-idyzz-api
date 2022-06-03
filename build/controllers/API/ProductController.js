@@ -102,9 +102,64 @@ var ProductController = /** @class */ (function () {
             });
         });
     };
+    ProductController.prototype.searchProducts = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var query, pathnumber, description, func, filterByFormula, funcs, fieldToFilter, key, element, finalFilter, records, products_2, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        query = req.query;
+                        pathnumber = query.pathnumber, description = query.description, func = query.func;
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 5, , 6]);
+                        filterByFormula = "";
+                        funcs = ["and", "or"];
+                        fieldToFilter = {
+                            pathnumber: "PartNumber",
+                            description: "Description",
+                        };
+                        //make this check sort of dynamic
+                        for (key in fieldToFilter) {
+                            element = fieldToFilter[key];
+                            if (query[key]) {
+                                filterByFormula += filterByFormula ? " , " : "";
+                                filterByFormula += "{".concat(element, "} = \"").concat(query[key], "\"");
+                            }
+                        }
+                        if (!filterByFormula) return [3 /*break*/, 3];
+                        finalFilter = func && funcs.includes(func)
+                            ? "".concat(func.toUpperCase(), "(").concat(filterByFormula, ")")
+                            : filterByFormula;
+                        console.log(finalFilter);
+                        return [4 /*yield*/, ProductModel.select({
+                                filterByFormula: finalFilter,
+                            }).all()];
+                    case 2:
+                        records = _a.sent();
+                        products_2 = [];
+                        records.map(function (record) {
+                            //console.log(record);
+                            products_2.push(__assign(__assign({}, record.fields), { id: record.getId() }));
+                        });
+                        if (products_2.length < 1) {
+                            return [2 /*return*/, res.statusJson(404, { data: { message: "No Product" } })];
+                        }
+                        return [2 /*return*/, res.statusJson(200, { data: products_2 })];
+                    case 3: return [2 /*return*/, res.statusJson(404, { data: { message: "No Product" } })];
+                    case 4: return [3 /*break*/, 6];
+                    case 5:
+                        error_2 = _a.sent();
+                        console.log(error_2);
+                        return [2 /*return*/, res.statusJson(500, { error: error_2 })];
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
     ProductController.prototype.getProduct = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var id, productRecord, product, error_2;
+            var id, productRecord, product, error_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -121,8 +176,8 @@ var ProductController = /** @class */ (function () {
                         product = __assign(__assign({}, productRecord.fields), { id: productRecord.getId() });
                         return [2 /*return*/, res.statusJson(200, { data: product })];
                     case 3:
-                        error_2 = _a.sent();
-                        return [2 /*return*/, res.statusJson(error_2.statusCode || 500, { error: error_2 })];
+                        error_3 = _a.sent();
+                        return [2 /*return*/, res.statusJson(error_3.statusCode || 500, { error: error_3 })];
                     case 4: return [2 /*return*/];
                 }
             });
@@ -134,6 +189,12 @@ var ProductController = /** @class */ (function () {
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", Promise)
     ], ProductController.prototype, "getProducts", null);
+    __decorate([
+        (0, index_1.get)("/products/search"),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Object, Object]),
+        __metadata("design:returntype", Promise)
+    ], ProductController.prototype, "searchProducts", null);
     __decorate([
         (0, index_1.get)("/product/:id"),
         __metadata("design:type", Function),

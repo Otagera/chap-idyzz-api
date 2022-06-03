@@ -41,12 +41,11 @@ class CartController {
         });
         if (cart) {
           for (let item of cart.cartItems) {
-            const productQ = productMap.get(item.productId);
-            item = {
-              ...item,
-              quantity: productQ ? item.quantity + productQ : item.quantity,
-            };
-            productQ && productMap.delete(item.productId);
+            const { productId } = item;
+            const productQ = productMap.get(productId);
+            if (productQ) {
+              item.quantity = productQ;
+            }
           }
           for (const [productId, quantity] of productMap) {
             cart.cartItems.push({
@@ -55,19 +54,32 @@ class CartController {
             });
           }
           await cart.save({});
+          return res.statusJson(200, {
+            data: {
+              message: "Products successfully edited to cart",
+              cart,
+            },
+          });
         } else {
           const newCart = new CartModel({
             userId,
             cartItems: products as CartItem[],
           });
           await newCart.save({});
+          return res.statusJson(201, {
+            data: {
+              message: "Products successfully added to cart",
+              cart: newCart,
+            },
+          });
         }
+      } else {
+        return res.statusJson(404, {
+          data: {
+            message: "User does not exist",
+          },
+        });
       }
-      return res.statusJson(200, {
-        data: {
-          message: "Order checked out",
-        },
-      });
     } catch (error) {
       console.log(error);
       return res.statusJson(500, { error });

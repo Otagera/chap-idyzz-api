@@ -1,0 +1,1 @@
+{"version":3,"file":"cart.interface.js","sourceRoot":"","sources":["../../src/interfaces/cart.interface.ts"],"names":[],"mappings":"","sourcesContent":["import { Document } from \"mongoose\";\n\nexport interface Cart extends Document {\n  userId: string;\n  cartItems: CartItem[];\n}\nexport interface CartItem {\n  productId: string;\n  quantity: number;\n}\n"]}

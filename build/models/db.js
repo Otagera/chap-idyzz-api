@@ -50,4 +50,5 @@ process.on("SIGTERM", function () {
 });
 require("./user.model");
 require("./order.model");
+require("./cart.model");
 //# sourceMappingURL=db.js.map

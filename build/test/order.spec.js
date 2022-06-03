@@ -45,147 +45,173 @@ var chai_1 = require("chai");
 var app_1 = require("../app");
 var ProductModel = (0, app_1.base)("product");
 var OrderModel = mongoose_1.default.model("Order");
+var CartModel = mongoose_1.default.model("Cart");
 describe("/api", function () {
     //So Id add authentication and try to signin before all the request and send the
     //token and be authenticated
     beforeEach(function () { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
         return [2 /*return*/];
     }); }); });
-    describe("post /order/checkout", function () {
-        it("should checkout an order", function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var res;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            this.timeout(100000);
-                            return [4 /*yield*/, (0, supertest_1.default)(app_1.app)
-                                    .post("/api/order/checkout")
-                                    .send({
-                                    email: "otagera@gmail.com",
-                                    products: [
-                                        { PartNumber: "C000065S048A", quantity: 2 },
-                                        { PartNumber: "N000082L124A", quantity: 2 },
-                                        { PartNumber: "SG00PL3030AA", quantity: 2 },
-                                        { PartNumber: "SG00PL3030AAd", quantity: 1 },
-                                    ],
-                                })];
-                        case 1:
-                            res = _a.sent();
-                            (0, chai_1.expect)(res.status).to.equal(200);
-                            (0, chai_1.expect)(res.body.data.length).not.equal(0);
-                            (0, chai_1.expect)(res.body.data.message).equal("Order checked out");
-                            return [2 /*return*/];
-                    }
-                });
-            });
-        });
+    /* describe("post /order/checkout", () => {
+      it("should checkout an order", async function () {
+        this.timeout(100000);
+        const res = await request(app)
+          .post("/api/order/checkout")
+          .send({
+            email: "otagera@gmail.com",
+            products: [
+              { PartNumber: "C000065S048A", quantity: 2 },
+              { PartNumber: "N000082L124A", quantity: 2 },
+              { PartNumber: "SG00PL3030AA", quantity: 2 },
+              { PartNumber: "SG00PL3030AAd", quantity: 1 },
+            ],
+          });
+        expect(res.status).to.equal(200);
+        expect(res.body.data.length).not.equal(0);
+        expect(res.body.data.message).equal("Order checked out");
+      });
     });
-    describe("get /order/verify", function () {
-        it("should unsuccessfully find order", function () {
+    describe("get /order/verify", () => {
+      it("should unsuccessfully find order", async function () {
+        this.timeout(100000);
+        const ress = await request(app)
+          .post("/api/order/checkout")
+          .send({
+            email: "otagera@gmail.com",
+            products: [
+              { PartNumber: "C000065S048A", quantity: 2 },
+              { PartNumber: "N000082L124A", quantity: 2 },
+              { PartNumber: "SG00PL3030AA", quantity: 2 },
+              { PartNumber: "SG00PL3030AAd", quantity: 1 },
+            ],
+          });
+        const res = await request(app).get(
+          `/api/order/verify/${ress.body.data.order.paymentRef}d`
+        );
+        const { data } = res.body;
+        expect(res.status).to.equal(200);
+        expect(data.length).not.equal(0);
+        expect(data.message).equal("Order not found");
+      });
+      it("should unsuccessfully verify an order payment", async function () {
+        this.timeout(100000);
+        const ress = await request(app)
+          .post("/api/order/checkout")
+          .send({
+            email: "otagera@gmail.com",
+            products: [
+              { PartNumber: "C000065S048A", quantity: 2 },
+              { PartNumber: "N000082L124A", quantity: 2 },
+              { PartNumber: "SG00PL3030AA", quantity: 2 },
+              { PartNumber: "SG00PL3030AAd", quantity: 1 },
+            ],
+          });
+        const res = await request(app).get(
+          `/api/order/verify/${ress.body.data.order.paymentRef}`
+        );
+        const { data } = res.body;
+        expect(res.status).to.equal(200);
+        expect(data.length).not.equal(0);
+        expect(data.message).equal("Order verification unsuccessful");
+      });
+      it("should successfully verify an order payment", async function () {
+        this.timeout(100000);
+        const ress = await request(app)
+          .post("/api/order/checkout")
+          .send({
+            email: "otagera@gmail.com",
+            products: [
+              { PartNumber: "C000065S048A", quantity: 2 },
+              { PartNumber: "N000082L124A", quantity: 2 },
+              { PartNumber: "SG00PL3030AA", quantity: 2 },
+              { PartNumber: "SG00PL3030AAd", quantity: 1 },
+            ],
+          });
+        console.log(ress.body.data.authorization_url);
+        setTimeout(async () => {
+          const res = await request(app).get(
+            `/api/order/verify/${ress.body.data.order.paymentRef}`
+          );
+          const { data } = res.body;
+          expect(res.status).to.equal(200);
+          expect(data.length).not.equal(0);
+          expect(data.message).equal("Order verification successful");
+          await OrderModel.deleteMany();
+        }, 30000);
+      });
+    }); */
+    describe("post /cart", function () {
+        it("should add items to cart", function () {
             return __awaiter(this, void 0, void 0, function () {
-                var ress, res, data;
+                var res, data;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0:
+                        case 0: return [4 /*yield*/, CartModel.deleteMany({})];
+                        case 1:
+                            _a.sent();
                             this.timeout(100000);
                             return [4 /*yield*/, (0, supertest_1.default)(app_1.app)
-                                    .post("/api/order/checkout")
+                                    .post("/api/cart")
                                     .send({
-                                    email: "otagera@gmail.com",
+                                    userId: "629551832fbf1068266f5cb7",
                                     products: [
-                                        { PartNumber: "C000065S048A", quantity: 2 },
-                                        { PartNumber: "N000082L124A", quantity: 2 },
-                                        { PartNumber: "SG00PL3030AA", quantity: 2 },
-                                        { PartNumber: "SG00PL3030AAd", quantity: 1 },
+                                        { productId: "recGvUezjm2KUtCdc", quantity: 2 },
+                                        { productId: "recESnRz5hSsHYFAO", quantity: 12 },
+                                        { productId: "recIwhNICRFecriHn", quantity: 5 },
+                                        { productId: "recKsJ9EvLq5VOIAR", quantity: 1 },
                                     ],
                                 })];
-                        case 1:
-                            ress = _a.sent();
-                            return [4 /*yield*/, (0, supertest_1.default)(app_1.app).get("/api/order/verify/".concat(ress.body.data.order.paymentRef, "d"))];
                         case 2:
                             res = _a.sent();
                             data = res.body.data;
-                            (0, chai_1.expect)(res.status).to.equal(200);
+                            (0, chai_1.expect)(res.status).to.equal(201);
                             (0, chai_1.expect)(data.length).not.equal(0);
-                            (0, chai_1.expect)(data.message).equal("Order not found");
+                            (0, chai_1.expect)(data.message).equal("Products successfully added to cart");
                             return [2 /*return*/];
                     }
                 });
             });
         });
-        it("should unsuccessfully verify an order payment", function () {
+        it("should edit amount if product already in cart", function () {
             return __awaiter(this, void 0, void 0, function () {
-                var ress, res, data;
+                var addRes, res, data;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             this.timeout(100000);
                             return [4 /*yield*/, (0, supertest_1.default)(app_1.app)
-                                    .post("/api/order/checkout")
+                                    .post("/api/cart")
                                     .send({
-                                    email: "otagera@gmail.com",
+                                    userId: "629551832fbf1068266f5cb7",
                                     products: [
-                                        { PartNumber: "C000065S048A", quantity: 2 },
-                                        { PartNumber: "N000082L124A", quantity: 2 },
-                                        { PartNumber: "SG00PL3030AA", quantity: 2 },
-                                        { PartNumber: "SG00PL3030AAd", quantity: 1 },
+                                        { productId: "recGvUezjm2KUtCdc", quantity: 2 },
+                                        { productId: "recESnRz5hSsHYFAO", quantity: 12 },
+                                        { productId: "recIwhNICRFecriHn", quantity: 5 },
+                                        { productId: "recKsJ9EvLq5VOIAR", quantity: 1 },
                                     ],
                                 })];
                         case 1:
-                            ress = _a.sent();
-                            return [4 /*yield*/, (0, supertest_1.default)(app_1.app).get("/api/order/verify/".concat(ress.body.data.order.paymentRef))];
+                            addRes = _a.sent();
+                            return [4 /*yield*/, (0, supertest_1.default)(app_1.app)
+                                    .post("/api/cart")
+                                    .send({
+                                    userId: "629551832fbf1068266f5cb7",
+                                    products: [
+                                        { productId: "recGvUezjm2KUtCdc", quantity: 4 },
+                                        { productId: "recESnRz5hSsHYFAO", quantity: 12 },
+                                        { productId: "recKsJ9EvLq5VOIAR", quantity: 13 },
+                                        {
+                                            productId: "recLuFdNG1DVRxZPo",
+                                            quantity: 33,
+                                        },
+                                    ],
+                                })];
                         case 2:
                             res = _a.sent();
                             data = res.body.data;
                             (0, chai_1.expect)(res.status).to.equal(200);
                             (0, chai_1.expect)(data.length).not.equal(0);
-                            (0, chai_1.expect)(data.message).equal("Order verification unsuccessful");
-                            return [2 /*return*/];
-                    }
-                });
-            });
-        });
-        it("should successfully verify an order payment", function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var ress;
-                var _this = this;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            this.timeout(100000);
-                            return [4 /*yield*/, (0, supertest_1.default)(app_1.app)
-                                    .post("/api/order/checkout")
-                                    .send({
-                                    email: "otagera@gmail.com",
-                                    products: [
-                                        { PartNumber: "C000065S048A", quantity: 2 },
-                                        { PartNumber: "N000082L124A", quantity: 2 },
-                                        { PartNumber: "SG00PL3030AA", quantity: 2 },
-                                        { PartNumber: "SG00PL3030AAd", quantity: 1 },
-                                    ],
-                                })];
-                        case 1:
-                            ress = _a.sent();
-                            console.log(ress.body.data.authorization_url);
-                            setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
-                                var res, data;
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0: return [4 /*yield*/, (0, supertest_1.default)(app_1.app).get("/api/order/verify/".concat(ress.body.data.order.paymentRef))];
-                                        case 1:
-                                            res = _a.sent();
-                                            data = res.body.data;
-                                            (0, chai_1.expect)(res.status).to.equal(200);
-                                            (0, chai_1.expect)(data.length).not.equal(0);
-                                            (0, chai_1.expect)(data.message).equal("Order verification successful");
-                                            return [4 /*yield*/, OrderModel.deleteMany()];
-                                        case 2:
-                                            _a.sent();
-                                            return [2 /*return*/];
-                                    }
-                                });
-                            }); }, 30000);
+                            (0, chai_1.expect)(data.message).equal("Products successfully edited to cart");
                             return [2 /*return*/];
                     }
                 });

@@ -86,48 +86,48 @@ var OrderController = /** @class */ (function () {
     }
     OrderController.prototype.checkout = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, email, products, callback_url, productsFound, totalAmount, newProducts, products_1, products_1_1, product, productRecord, e_1_1, paymentdata, POST, config, response, order, newOrder, error_1;
-            var e_1, _b;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            var _a, email, products, callback_url, productsFound, totalAmount, newProducts, _b, _c, product, productRecord, e_1_1, paymentdata, POST, config, response, order, newOrder, error_1;
+            var e_1, _d;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
                     case 0:
                         _a = req.body, email = _a.email, products = _a.products, callback_url = _a.callback_url;
-                        _c.label = 1;
+                        _e.label = 1;
                     case 1:
-                        _c.trys.push([1, 12, , 13]);
+                        _e.trys.push([1, 12, , 13]);
                         productsFound = [];
                         totalAmount = 0;
                         newProducts = [];
-                        _c.label = 2;
+                        _e.label = 2;
                     case 2:
-                        _c.trys.push([2, 7, 8, 9]);
-                        products_1 = __values(products), products_1_1 = products_1.next();
-                        _c.label = 3;
+                        _e.trys.push([2, 7, 8, 9]);
+                        _b = __values(products), _c = _b.next();
+                        _e.label = 3;
                     case 3:
-                        if (!!products_1_1.done) return [3 /*break*/, 6];
-                        product = products_1_1.value;
+                        if (!!_c.done) return [3 /*break*/, 6];
+                        product = _c.value;
                         return [4 /*yield*/, ProductModel.select({
                                 filterByFormula: "PartNumber = \"".concat(product.PartNumber, "\""),
                             }).all()];
                     case 4:
-                        productRecord = _c.sent();
+                        productRecord = _e.sent();
                         if (productRecord.length > 0) {
                             productsFound.push(productRecord[0].fields);
                             totalAmount += productRecord[0].fields.MSRP * product.quantity;
-                            newProducts.push(__assign(__assign({}, product), { id: productRecord[0].getId() }));
+                            newProducts.push(__assign(__assign({}, product), { productId: productRecord[0].getId() }));
                         }
-                        _c.label = 5;
+                        _e.label = 5;
                     case 5:
-                        products_1_1 = products_1.next();
+                        _c = _b.next();
                         return [3 /*break*/, 3];
                     case 6: return [3 /*break*/, 9];
                     case 7:
-                        e_1_1 = _c.sent();
+                        e_1_1 = _e.sent();
                         e_1 = { error: e_1_1 };
                         return [3 /*break*/, 9];
                     case 8:
                         try {
-                            if (products_1_1 && !products_1_1.done && (_b = products_1.return)) _b.call(products_1);
+                            if (_c && !_c.done && (_d = _b.return)) _d.call(_b);
                         }
                         finally { if (e_1) throw e_1.error; }
                         return [7 /*endfinally*/];
@@ -146,7 +146,7 @@ var OrderController = /** @class */ (function () {
                         };
                         return [4 /*yield*/, (0, axios_1.default)(config)];
                     case 10:
-                        response = _c.sent();
+                        response = _e.sent();
                         order = new OrderModel({
                             products: newProducts,
                             amount: totalAmount,
@@ -154,7 +154,7 @@ var OrderController = /** @class */ (function () {
                         });
                         return [4 /*yield*/, order.save({})];
                     case 11:
-                        newOrder = _c.sent();
+                        newOrder = _e.sent();
                         return [2 /*return*/, res.statusJson(200, {
                                 data: {
                                     message: "Order checked out",
@@ -163,7 +163,7 @@ var OrderController = /** @class */ (function () {
                                 },
                             })];
                     case 12:
-                        error_1 = _c.sent();
+                        error_1 = _e.sent();
                         console.log(error_1);
                         return [2 /*return*/, res.statusJson(500, { error: error_1 })];
                     case 13: return [2 /*return*/];
@@ -221,7 +221,7 @@ var OrderController = /** @class */ (function () {
                     case 7:
                         if (!!_c.done) return [3 /*break*/, 10];
                         product = _c.value;
-                        return [4 /*yield*/, ProductModel.find("".concat(product.id))];
+                        return [4 /*yield*/, ProductModel.find("".concat(product.productId))];
                     case 8:
                         prod = _e.sent();
                         products.push({
@@ -279,7 +279,7 @@ var OrderController = /** @class */ (function () {
     };
     __decorate([
         (0, index_1.post)("/checkout"),
-        (0, index_1.bodyValidator)("email", "products"),
+        (0, index_1.bodyValidator)("email", "products", "callback_url"),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", Promise)
