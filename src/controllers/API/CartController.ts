@@ -166,4 +166,41 @@ class CartController {
       return res.statusJson(500, { error });
     }
   }
+
+  @del("/cart/:id/:productId")
+  async deleteCartItem(req: Request, res: Response) {
+    const { id, productId } = req.params;
+    try {
+      if (mongoose.Types.ObjectId.isValid(id)) {
+        const cart = await CartModel.findById(id);
+        if (cart) {
+          cart.cartItems = cart.cartItems.filter(
+            (item) => item.productId !== productId
+          );
+          await cart.save({});
+          return res.statusJson(200, {
+            data: {
+              message: "Cart item deleted successfully",
+              cart,
+            },
+          });
+        } else {
+          return res.statusJson(404, {
+            data: {
+              message: "Cart by that id not found",
+            },
+          });
+        }
+      } else {
+        return res.statusJson(404, {
+          data: {
+            message: "Invalid cart Id",
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.statusJson(500, { error });
+    }
+  }
 }

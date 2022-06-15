@@ -14,7 +14,7 @@ describe("/api", () => {
   //token and be authenticated
   let cartId = "0";
   beforeEach(async () => {});
-  /* describe("post /order/checkout", () => {
+  describe("post /order/checkout", () => {
     it("should checkout an order", async function () {
       this.timeout(100000);
       const res = await request(app)
@@ -27,6 +27,7 @@ describe("/api", () => {
             { PartNumber: "SG00PL3030AA", quantity: 2 },
             { PartNumber: "SG00PL3030AAd", quantity: 1 },
           ],
+          callback_url: "www.google.com",
         });
       expect(res.status).to.equal(200);
       expect(res.body.data.length).not.equal(0);
@@ -46,6 +47,7 @@ describe("/api", () => {
             { PartNumber: "SG00PL3030AA", quantity: 2 },
             { PartNumber: "SG00PL3030AAd", quantity: 1 },
           ],
+          callback_url: "www.google.com",
         });
       const res = await request(app).get(
         `/api/order/verify/${ress.body.data.order.paymentRef}d`
@@ -67,6 +69,7 @@ describe("/api", () => {
             { PartNumber: "SG00PL3030AA", quantity: 2 },
             { PartNumber: "SG00PL3030AAd", quantity: 1 },
           ],
+          callback_url: "www.google.com",
         });
       const res = await request(app).get(
         `/api/order/verify/${ress.body.data.order.paymentRef}`
@@ -88,6 +91,7 @@ describe("/api", () => {
             { PartNumber: "SG00PL3030AA", quantity: 2 },
             { PartNumber: "SG00PL3030AAd", quantity: 1 },
           ],
+          callback_url: "www.google.com",
         });
       console.log(ress.body.data.authorization_url);
       setTimeout(async () => {
@@ -101,7 +105,7 @@ describe("/api", () => {
         await OrderModel.deleteMany();
       }, 30000);
     });
-  }); */
+  });
   describe("post /cart", () => {
     it("should not find user", async function () {
       await CartModel.deleteMany({});
@@ -194,7 +198,6 @@ describe("/api", () => {
       this.timeout(100000);
       const res = await request(app).get("/api/carts");
       const { data } = res.body;
-      console.log(data.carts);
       cartId = data.carts[0]._id;
       expect(res.status).to.equal(200);
       expect(data.carts.length).equal(1);
@@ -234,7 +237,47 @@ describe("/api", () => {
       expect(data.message).to.equal("Invalid cart Id");
     });
   });
-  describe("Delete /cart", () => {
+  describe("Delete /cart/:id/:productId", () => {
+    it("should delete cart item by id", async function () {
+      const res = await request(app).del(
+        `/api/cart/${cartId}/recESnRz5hSsHYFAO`
+      );
+      const { data } = res.body;
+      expect(res.status).to.equal(200);
+      expect(data.message).to.equal("Cart item deleted successfully");
+      // expect(data.cart.acknowledged).to.equal(true);
+    });
+
+    it("should not find cart to delete", async function () {
+      const generateId = () => {
+        var timestamp = ((new Date().getTime() / 1000) | 0).toString(16);
+        return (
+          timestamp +
+          "xxxxxxxxxxxxxxxx"
+            .replace(/[x]/g, function () {
+              return ((Math.random() * 16) | 0).toString(16);
+            })
+            .toLowerCase()
+        );
+      };
+      const res = await request(app).del(
+        `/api/cart/${generateId()}/recESnRz5hSsHYFAO`
+      );
+      const { data } = res.body;
+      expect(res.status).to.equal(404);
+      expect(data.message).to.equal("Cart by that id not found");
+    });
+
+    it("should not find cart to delete because of invalid cart id", async function () {
+      const res = await request(app).del(
+        `/api/cart/${"fjhrywhd/recESnRz5hSsHYFAO"}`
+      );
+      const { data } = res.body;
+      expect(res.status).to.equal(404);
+      expect(data.message).to.equal("Invalid cart Id");
+    });
+  });
+  describe("Delete /cart/:id", () => {
     it("should delete cart by id", async function () {
       const res = await request(app).del(`/api/cart/${cartId}`);
       const { data } = res.body;
@@ -258,7 +301,6 @@ describe("/api", () => {
       };
       const res = await request(app).del(`/api/cart/${generateId()}`);
       const { data } = res.body;
-      console.log(data);
       expect(res.status).to.equal(404);
       expect(data.message).to.equal("Cart by that id not found");
       expect(data.cart.acknowledged).to.equal(true);
