@@ -1,19 +1,29 @@
-import mongoose from "mongoose";
-import request from "supertest";
-import { expect } from "chai";
-import { app, base } from "../app";
-import { Product, Order, Cart } from "../interfaces";
-import { read } from "fs";
-
-const ProductModel = base<Product>("product");
-const OrderModel = mongoose.model<Order>("Order");
-const CartModel = mongoose.model<Cart>("Cart");
+import {
+  app,
+  request,
+  expect,
+  OrderModel,
+  CartModel,
+  UserModel,
+} from "./common.spec";
 
 describe("/api", () => {
   //So Id add authentication and try to signin before all the request and send the
   //token and be authenticated
   let cartId = "0";
-  beforeEach(async () => {});
+  let userId = "0";
+  before(async () => {
+    const user = new UserModel({
+      username: "otagera",
+      password: 12345678,
+      email: "string",
+      address: "string",
+      firstname: "string",
+      lastname: "string",
+    });
+    await user.save();
+    userId = user._id;
+  });
   describe("post /order/checkout", () => {
     it("should checkout an order", async function () {
       this.timeout(100000);
@@ -131,7 +141,7 @@ describe("/api", () => {
       const res = await request(app)
         .post("/api/cart")
         .send({
-          userId: "629551832fbf1068266f5cb7",
+          userId,
           products: [
             { productId: "recGvUezjm2KUtCdc", quantity: 2 },
             { productId: "recESnRz5hSsHYFAO", quantity: 12 },
@@ -149,7 +159,7 @@ describe("/api", () => {
       const addRes = await request(app)
         .post("/api/cart")
         .send({
-          userId: "629551832fbf1068266f5cb7",
+          userId,
           products: [
             { productId: "recGvUezjm2KUtCdc", quantity: 2 },
             { productId: "recESnRz5hSsHYFAO", quantity: 12 },
@@ -160,7 +170,7 @@ describe("/api", () => {
       const res = await request(app)
         .post("/api/cart")
         .send({
-          userId: "629551832fbf1068266f5cb7",
+          userId,
           products: [
             { productId: "recGvUezjm2KUtCdc", quantity: 4 },
             { productId: "recESnRz5hSsHYFAO", quantity: 12 },
@@ -184,7 +194,7 @@ describe("/api", () => {
       const t = await request(app)
         .post("/api/cart")
         .send({
-          userId: "629551832fbf1068266f5cb7",
+          userId,
           products: [
             { productId: "recGvUezjm2KUtCdc", quantity: 2 },
             { productId: "recESnRz5hSsHYFAO", quantity: 12 },

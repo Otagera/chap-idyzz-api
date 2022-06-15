@@ -1,10 +1,4 @@
-/* import mongoose from "mongoose";
-import request from "supertest";
-import { expect } from "chai";
-import { app } from "../app";
-import { User } from "../interfaces";
-
-const UserModel = mongoose.model<User>("User");
+import { app, request, expect, UserModel } from "./common.spec";
 
 describe("/auth", () => {
   beforeEach(async () => {
@@ -150,4 +144,3 @@ describe("/auth", () => {
     });
   });
 });
- */

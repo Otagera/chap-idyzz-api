@@ -1,11 +1,4 @@
-/* import mongoose from "mongoose";
-import request from "supertest";
-import { expect } from "chai";
-import { app, base } from "../app";
-import { Product } from "../interfaces";
-import url from "url";
-
-const ProductModel = base<Product>("product");
+import { app, request, expect, ProductModel, url } from "./common.spec";
 
 describe("/api", () => {
   //So Id add authentication and try to signin before all the request and send the
@@ -108,4 +101,3 @@ describe("/api", () => {
   });
 });
 // ◢ ◤
- */
