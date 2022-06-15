@@ -8,7 +8,7 @@ const UserModel = mongoose.model<User>("User");
 const CartModel = mongoose.model<Cart>("Cart");
 const ProductModel = base<Product>("product");
 
-@controller("/api/cart")
+@controller("/api")
 class CartController {
   //write test asap for this and other cart operations
   //add
@@ -23,7 +23,7 @@ class CartController {
   // get
   //  item
   //  items
-  @post("/")
+  @post("/cart")
   @bodyValidator("userId", "products")
   async addToCart(req: Request, res: Response) {
     const { userId, products } = req.body;
@@ -34,7 +34,6 @@ class CartController {
         productRecord && productMap.set(product.productId, product.quantity);
       }
       const user = await UserModel.findById(userId);
-      //if no user throw no success, invalid user
       if (user) {
         let cart = await CartModel.findOne({
           userId,
@@ -77,6 +76,56 @@ class CartController {
         return res.statusJson(404, {
           data: {
             message: "User does not exist",
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.statusJson(500, { error });
+    }
+  }
+
+  @get("/carts")
+  async getCarts(req: Request, res: Response) {
+    try {
+      const carts = await CartModel.find({});
+
+      return res.statusJson(200, {
+        data: {
+          message: "Retrieved carts successfully",
+          carts,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.statusJson(500, { error });
+    }
+  }
+
+  @get("/cart/:id")
+  async getCart(req: Request, res: Response) {
+    const { id } = req.params;
+    try {
+      if (mongoose.Types.ObjectId.isValid(id)) {
+        const cart = await CartModel.findById(id);
+        if (cart) {
+          return res.statusJson(200, {
+            data: {
+              message: "Cart retrieved successfully",
+              cart,
+            },
+          });
+        } else {
+          return res.statusJson(404, {
+            data: {
+              message: "Cart not found",
+            },
+          });
+        }
+      } else {
+        return res.statusJson(404, {
+          data: {
+            message: "Invalid userId",
           },
         });
       }
