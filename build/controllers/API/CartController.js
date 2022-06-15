@@ -94,9 +94,6 @@ var CartController = /** @class */ (function () {
     //  multiple items
     //  entire items
     //  one item
-    // get
-    //  item
-    //  items
     CartController.prototype.addToCart = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             var _a, userId, products, productMap, _b, _c, product, productRecord, e_1_1, user, cart, _d, _e, item, productId, productQ, productMap_1, productMap_1_1, _f, productId, quantity, newCart, error_1;
@@ -107,7 +104,7 @@ var CartController = /** @class */ (function () {
                         _a = req.body, userId = _a.userId, products = _a.products;
                         _k.label = 1;
                     case 1:
-                        _k.trys.push([1, 16, , 17]);
+                        _k.trys.push([1, 18, , 19]);
                         productMap = new Map();
                         _k.label = 2;
                     case 2:
@@ -136,10 +133,12 @@ var CartController = /** @class */ (function () {
                         }
                         finally { if (e_1) throw e_1.error; }
                         return [7 /*endfinally*/];
-                    case 9: return [4 /*yield*/, UserModel.findById(userId)];
+                    case 9:
+                        console.log("after population", productMap);
+                        return [4 /*yield*/, UserModel.findById(userId)];
                     case 10:
                         user = _k.sent();
-                        if (!user) return [3 /*break*/, 15];
+                        if (!user) return [3 /*break*/, 16];
                         return [4 /*yield*/, CartModel.findOne({
                                 userId: userId,
                             })];
@@ -151,8 +150,12 @@ var CartController = /** @class */ (function () {
                                 item = _e.value;
                                 productId = item.productId;
                                 productQ = productMap.get(productId);
+                                console.log("###################");
+                                console.log(productId, productMap);
+                                console.log("###################");
                                 if (productQ) {
                                     item.quantity = productQ;
+                                    productMap.delete(productId);
                                 }
                             }
                         }
@@ -163,6 +166,7 @@ var CartController = /** @class */ (function () {
                             }
                             finally { if (e_2) throw e_2.error; }
                         }
+                        console.log("after remove", productMap);
                         try {
                             for (productMap_1 = __values(productMap), productMap_1_1 = productMap_1.next(); !productMap_1_1.done; productMap_1_1 = productMap_1.next()) {
                                 _f = __read(productMap_1_1.value, 2), productId = _f[0], quantity = _f[1];
@@ -203,24 +207,112 @@ var CartController = /** @class */ (function () {
                                 },
                             })];
                     case 15: return [3 /*break*/, 17];
-                    case 16:
+                    case 16: return [2 /*return*/, res.statusJson(404, {
+                            data: {
+                                message: "User does not exist",
+                            },
+                        })];
+                    case 17: return [3 /*break*/, 19];
+                    case 18:
                         error_1 = _k.sent();
                         console.log(error_1);
                         return [2 /*return*/, res.statusJson(500, { error: error_1 })];
-                    case 17: return [2 /*return*/];
+                    case 19: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    CartController.prototype.getCarts = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var carts, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, CartModel.find({})];
+                    case 1:
+                        carts = _a.sent();
+                        return [2 /*return*/, res.statusJson(200, {
+                                data: {
+                                    message: "Retrieved carts successfully",
+                                    carts: carts,
+                                },
+                            })];
+                    case 2:
+                        error_2 = _a.sent();
+                        console.log(error_2);
+                        return [2 /*return*/, res.statusJson(500, { error: error_2 })];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    CartController.prototype.getCart = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var id, cart, error_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        id = req.params.id;
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 5, , 6]);
+                        if (!mongoose_1.default.Types.ObjectId.isValid(id)) return [3 /*break*/, 3];
+                        return [4 /*yield*/, CartModel.findById(id)];
+                    case 2:
+                        cart = _a.sent();
+                        if (cart) {
+                            return [2 /*return*/, res.statusJson(200, {
+                                    data: {
+                                        message: "Cart retrieved successfully",
+                                        cart: cart,
+                                    },
+                                })];
+                        }
+                        else {
+                            return [2 /*return*/, res.statusJson(404, {
+                                    data: {
+                                        message: "Cart not found",
+                                    },
+                                })];
+                        }
+                        return [3 /*break*/, 4];
+                    case 3: return [2 /*return*/, res.statusJson(404, {
+                            data: {
+                                message: "Invalid userId",
+                            },
+                        })];
+                    case 4: return [3 /*break*/, 6];
+                    case 5:
+                        error_3 = _a.sent();
+                        console.log(error_3);
+                        return [2 /*return*/, res.statusJson(500, { error: error_3 })];
+                    case 6: return [2 /*return*/];
                 }
             });
         });
     };
     __decorate([
-        (0, index_1.post)("/"),
+        (0, index_1.post)("/cart"),
         (0, index_1.bodyValidator)("userId", "products"),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", Promise)
     ], CartController.prototype, "addToCart", null);
+    __decorate([
+        (0, index_1.get)("/carts"),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Object, Object]),
+        __metadata("design:returntype", Promise)
+    ], CartController.prototype, "getCarts", null);
+    __decorate([
+        (0, index_1.get)("/cart/:id"),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Object, Object]),
+        __metadata("design:returntype", Promise)
+    ], CartController.prototype, "getCart", null);
     CartController = __decorate([
-        (0, index_1.controller)("/api/cart")
+        (0, index_1.controller)("/api")
     ], CartController);
     return CartController;
 }());

@@ -49,6 +49,7 @@ var CartModel = mongoose_1.default.model("Cart");
 describe("/api", function () {
     //So Id add authentication and try to signin before all the request and send the
     //token and be authenticated
+    var cartId = "0";
     beforeEach(function () { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
         return [2 /*return*/];
     }); }); });
@@ -141,6 +142,36 @@ describe("/api", function () {
       });
     }); */
     describe("post /cart", function () {
+        it("should not find user", function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var res, data;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, CartModel.deleteMany({})];
+                        case 1:
+                            _a.sent();
+                            this.timeout(100000);
+                            return [4 /*yield*/, (0, supertest_1.default)(app_1.app)
+                                    .post("/api/cart")
+                                    .send({
+                                    userId: "629551832fbf1068266f5cb6",
+                                    products: [
+                                        { productId: "recGvUezjm2KUtCdc", quantity: 2 },
+                                        { productId: "recESnRz5hSsHYFAO", quantity: 12 },
+                                        { productId: "recIwhNICRFecriHn", quantity: 5 },
+                                        { productId: "recKsJ9EvLq5VOIAR", quantity: 1 },
+                                    ],
+                                })];
+                        case 2:
+                            res = _a.sent();
+                            data = res.body.data;
+                            (0, chai_1.expect)(res.status).to.equal(404);
+                            (0, chai_1.expect)(data.message).equal("User does not exist");
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        });
         it("should add items to cart", function () {
             return __awaiter(this, void 0, void 0, function () {
                 var res, data;
@@ -212,6 +243,118 @@ describe("/api", function () {
                             (0, chai_1.expect)(res.status).to.equal(200);
                             (0, chai_1.expect)(data.length).not.equal(0);
                             (0, chai_1.expect)(data.message).equal("Products successfully edited to cart");
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        });
+    });
+    describe("GET /carts", function () {
+        beforeEach(function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var t;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.timeout(50000);
+                            return [4 /*yield*/, CartModel.deleteMany({})];
+                        case 1:
+                            _a.sent();
+                            return [4 /*yield*/, (0, supertest_1.default)(app_1.app)
+                                    .post("/api/cart")
+                                    .send({
+                                    userId: "629551832fbf1068266f5cb7",
+                                    products: [
+                                        { productId: "recGvUezjm2KUtCdc", quantity: 2 },
+                                        { productId: "recESnRz5hSsHYFAO", quantity: 12 },
+                                        { productId: "recIwhNICRFecriHn", quantity: 5 },
+                                        { productId: "recKsJ9EvLq5VOIAR", quantity: 1 },
+                                    ],
+                                })];
+                        case 2:
+                            t = _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        });
+        it("should return all cart items", function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var res, data;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.timeout(100000);
+                            return [4 /*yield*/, (0, supertest_1.default)(app_1.app).get("/api/carts")];
+                        case 1:
+                            res = _a.sent();
+                            data = res.body.data;
+                            console.log(data.carts);
+                            cartId = data.carts[0]._id;
+                            (0, chai_1.expect)(res.status).to.equal(200);
+                            (0, chai_1.expect)(data.carts.length).equal(1);
+                            (0, chai_1.expect)(data.message).equal("Retrieved carts successfully");
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        });
+    });
+    describe("GET /cart", function () {
+        it("should return cart by id", function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var res, data;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, (0, supertest_1.default)(app_1.app).get("/api/cart/".concat(cartId))];
+                        case 1:
+                            res = _a.sent();
+                            data = res.body.data;
+                            (0, chai_1.expect)(res.status).to.equal(200);
+                            (0, chai_1.expect)(data.message).to.equal("Cart retrieved successfully");
+                            (0, chai_1.expect)(data.message).to.equal("Cart retrieved successfully");
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        });
+        it("should say not found", function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var generateId, res, data;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            generateId = function () {
+                                var timestamp = ((new Date().getTime() / 1000) | 0).toString(16);
+                                return (timestamp +
+                                    "xxxxxxxxxxxxxxxx"
+                                        .replace(/[x]/g, function () {
+                                        return ((Math.random() * 16) | 0).toString(16);
+                                    })
+                                        .toLowerCase());
+                            };
+                            return [4 /*yield*/, (0, supertest_1.default)(app_1.app).get("/api/cart/".concat(generateId()))];
+                        case 1:
+                            res = _a.sent();
+                            data = res.body.data;
+                            (0, chai_1.expect)(res.status).to.equal(404);
+                            (0, chai_1.expect)(data.message).to.equal("Cart not found");
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        });
+        it("should say not found", function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var res, data;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, (0, supertest_1.default)(app_1.app).get("/api/cart/".concat("fjhrywhd"))];
+                        case 1:
+                            res = _a.sent();
+                            data = res.body.data;
+                            (0, chai_1.expect)(res.status).to.equal(404);
+                            (0, chai_1.expect)(data.message).to.equal("Invalid userId");
                             return [2 /*return*/];
                     }
                 });

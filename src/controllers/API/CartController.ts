@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
-import { get, post, bodyValidator, controller } from "../decorators/index";
+import { get, post, bodyValidator, controller, del } from "../decorators/index";
 import { Product, Order, User, Cart, CartItem } from "../../interfaces";
 import { base } from "../../app";
 
@@ -20,9 +20,6 @@ class CartController {
   //  multiple items
   //  entire items
   //  one item
-  // get
-  //  item
-  //  items
   @post("/cart")
   @bodyValidator("userId", "products")
   async addToCart(req: Request, res: Response) {
@@ -44,6 +41,7 @@ class CartController {
             const productQ = productMap.get(productId);
             if (productQ) {
               item.quantity = productQ;
+              productMap.delete(productId);
             }
           }
           for (const [productId, quantity] of productMap) {
@@ -125,7 +123,41 @@ class CartController {
       } else {
         return res.statusJson(404, {
           data: {
-            message: "Invalid userId",
+            message: "Invalid cart Id",
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.statusJson(500, { error });
+    }
+  }
+
+  @del("/cart/:id")
+  async deleteCart(req: Request, res: Response) {
+    const { id } = req.params;
+    try {
+      if (mongoose.Types.ObjectId.isValid(id)) {
+        const cart = await CartModel.deleteOne({ id });
+        if (cart.deletedCount) {
+          return res.statusJson(200, {
+            data: {
+              message: "Cart deleted successfully",
+              cart,
+            },
+          });
+        } else {
+          return res.statusJson(404, {
+            data: {
+              message: "Cart by that id not found",
+              cart,
+            },
+          });
+        }
+      } else {
+        return res.statusJson(404, {
+          data: {
+            message: "Invalid cart Id",
           },
         });
       }

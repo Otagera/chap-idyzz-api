@@ -174,7 +174,7 @@ describe("/api", () => {
     });
   });
   describe("GET /carts", () => {
-    /*  beforeEach(async function () {
+    beforeEach(async function () {
       this.timeout(50000);
       await CartModel.deleteMany({});
       const t = await request(app)
@@ -189,7 +189,7 @@ describe("/api", () => {
           ],
         });
       // console.log(t);
-    }); */
+    });
     it("should return all cart items", async function () {
       this.timeout(100000);
       const res = await request(app).get("/api/carts");
@@ -206,14 +206,10 @@ describe("/api", () => {
       const res = await request(app).get(`/api/cart/${cartId}`);
       const { data } = res.body;
       expect(res.status).to.equal(200);
-      /* expect(data.cart).to.have.property("PartNumber", "C060082R118A");
-      expect(data.cart).to.have.property(
-        "Description",
-        "PTP 820 RFU-C,6HGHz,TR340B,Ch5W8,Lo,6581-6739MHz"
-      ); */
+      expect(data.message).to.equal("Cart retrieved successfully");
     });
 
-    it("should say not found", async function () {
+    it("should find cart", async function () {
       const generateId = () => {
         var timestamp = ((new Date().getTime() / 1000) | 0).toString(16);
         return (
@@ -231,11 +227,49 @@ describe("/api", () => {
       expect(data.message).to.equal("Cart not found");
     });
 
-    it("should say not found", async function () {
+    it("should say not found because of invalid cart id", async function () {
       const res = await request(app).get(`/api/cart/${"fjhrywhd"}`);
       const { data } = res.body;
       expect(res.status).to.equal(404);
-      expect(data.message).to.equal("Invalid userId");
+      expect(data.message).to.equal("Invalid cart Id");
+    });
+  });
+  describe("Delete /cart", () => {
+    it("should delete cart by id", async function () {
+      const res = await request(app).del(`/api/cart/${cartId}`);
+      const { data } = res.body;
+      expect(res.status).to.equal(200);
+      expect(data.message).to.equal("Cart deleted successfully");
+      expect(data.cart.acknowledged).to.equal(true);
+      expect(data.cart.deletedCount).to.equal(1);
+    });
+
+    it("should not find cart to delete", async function () {
+      const generateId = () => {
+        var timestamp = ((new Date().getTime() / 1000) | 0).toString(16);
+        return (
+          timestamp +
+          "xxxxxxxxxxxxxxxx"
+            .replace(/[x]/g, function () {
+              return ((Math.random() * 16) | 0).toString(16);
+            })
+            .toLowerCase()
+        );
+      };
+      const res = await request(app).del(`/api/cart/${generateId()}`);
+      const { data } = res.body;
+      console.log(data);
+      expect(res.status).to.equal(404);
+      expect(data.message).to.equal("Cart by that id not found");
+      expect(data.cart.acknowledged).to.equal(true);
+      expect(data.cart.deletedCount).to.equal(0);
+    });
+
+    it("should not find cart to delete because of invalid cart id", async function () {
+      const res = await request(app).del(`/api/cart/${"fjhrywhd"}`);
+      const { data } = res.body;
+      expect(res.status).to.equal(404);
+      expect(data.message).to.equal("Invalid cart Id");
     });
   });
 });
