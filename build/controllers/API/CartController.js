@@ -133,9 +133,7 @@ var CartController = /** @class */ (function () {
                         }
                         finally { if (e_1) throw e_1.error; }
                         return [7 /*endfinally*/];
-                    case 9:
-                        console.log("after population", productMap);
-                        return [4 /*yield*/, UserModel.findById(userId)];
+                    case 9: return [4 /*yield*/, UserModel.findById(userId)];
                     case 10:
                         user = _k.sent();
                         if (!user) return [3 /*break*/, 16];
@@ -150,9 +148,6 @@ var CartController = /** @class */ (function () {
                                 item = _e.value;
                                 productId = item.productId;
                                 productQ = productMap.get(productId);
-                                console.log("###################");
-                                console.log(productId, productMap);
-                                console.log("###################");
                                 if (productQ) {
                                     item.quantity = productQ;
                                     productMap.delete(productId);
@@ -166,7 +161,6 @@ var CartController = /** @class */ (function () {
                             }
                             finally { if (e_2) throw e_2.error; }
                         }
-                        console.log("after remove", productMap);
                         try {
                             for (productMap_1 = __values(productMap), productMap_1_1 = productMap_1.next(); !productMap_1_1.done; productMap_1_1 = productMap_1.next()) {
                                 _f = __read(productMap_1_1.value, 2), productId = _f[0], quantity = _f[1];
@@ -279,7 +273,7 @@ var CartController = /** @class */ (function () {
                         return [3 /*break*/, 4];
                     case 3: return [2 /*return*/, res.statusJson(404, {
                             data: {
-                                message: "Invalid userId",
+                                message: "Invalid cart Id",
                             },
                         })];
                     case 4: return [3 /*break*/, 6];
@@ -288,6 +282,98 @@ var CartController = /** @class */ (function () {
                         console.log(error_3);
                         return [2 /*return*/, res.statusJson(500, { error: error_3 })];
                     case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    CartController.prototype.deleteCart = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var id, cart, error_4;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        id = req.params.id;
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 5, , 6]);
+                        if (!mongoose_1.default.Types.ObjectId.isValid(id)) return [3 /*break*/, 3];
+                        return [4 /*yield*/, CartModel.deleteOne({ id: id })];
+                    case 2:
+                        cart = _a.sent();
+                        if (cart.deletedCount) {
+                            return [2 /*return*/, res.statusJson(200, {
+                                    data: {
+                                        message: "Cart deleted successfully",
+                                        cart: cart,
+                                    },
+                                })];
+                        }
+                        else {
+                            return [2 /*return*/, res.statusJson(404, {
+                                    data: {
+                                        message: "Cart by that id not found",
+                                        cart: cart,
+                                    },
+                                })];
+                        }
+                        return [3 /*break*/, 4];
+                    case 3: return [2 /*return*/, res.statusJson(404, {
+                            data: {
+                                message: "Invalid cart Id",
+                            },
+                        })];
+                    case 4: return [3 /*break*/, 6];
+                    case 5:
+                        error_4 = _a.sent();
+                        console.log(error_4);
+                        return [2 /*return*/, res.statusJson(500, { error: error_4 })];
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    CartController.prototype.deleteCartItem = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, id, productId, cart, error_5;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = req.params, id = _a.id, productId = _a.productId;
+                        _b.label = 1;
+                    case 1:
+                        _b.trys.push([1, 8, , 9]);
+                        if (!mongoose_1.default.Types.ObjectId.isValid(id)) return [3 /*break*/, 6];
+                        return [4 /*yield*/, CartModel.findById(id)];
+                    case 2:
+                        cart = _b.sent();
+                        if (!cart) return [3 /*break*/, 4];
+                        cart.cartItems = cart.cartItems.filter(function (item) { return item.productId !== productId; });
+                        return [4 /*yield*/, cart.save({})];
+                    case 3:
+                        _b.sent();
+                        return [2 /*return*/, res.statusJson(200, {
+                                data: {
+                                    message: "Cart item deleted successfully",
+                                    cart: cart,
+                                },
+                            })];
+                    case 4: return [2 /*return*/, res.statusJson(404, {
+                            data: {
+                                message: "Cart by that id not found",
+                            },
+                        })];
+                    case 5: return [3 /*break*/, 7];
+                    case 6: return [2 /*return*/, res.statusJson(404, {
+                            data: {
+                                message: "Invalid cart Id",
+                            },
+                        })];
+                    case 7: return [3 /*break*/, 9];
+                    case 8:
+                        error_5 = _b.sent();
+                        console.log(error_5);
+                        return [2 /*return*/, res.statusJson(500, { error: error_5 })];
+                    case 9: return [2 /*return*/];
                 }
             });
         });
@@ -311,6 +397,18 @@ var CartController = /** @class */ (function () {
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", Promise)
     ], CartController.prototype, "getCart", null);
+    __decorate([
+        (0, index_1.del)("/cart/:id"),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Object, Object]),
+        __metadata("design:returntype", Promise)
+    ], CartController.prototype, "deleteCart", null);
+    __decorate([
+        (0, index_1.del)("/cart/:id/:productId"),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Object, Object]),
+        __metadata("design:returntype", Promise)
+    ], CartController.prototype, "deleteCartItem", null);
     CartController = __decorate([
         (0, index_1.controller)("/api")
     ], CartController);

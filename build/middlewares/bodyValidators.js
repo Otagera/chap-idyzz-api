@@ -16,7 +16,7 @@ var bodyValidators = function (keys) {
     return function (req, res, next) {
         var e_1, _a;
         if (!req.body) {
-            res.status(422).send('Invalid request');
+            res.status(422).send("Invalid request");
             return;
         }
         try {
